@@ -1,0 +1,12 @@
+[submodule "ext/cpp-httplib"]
+	path = ext/cpp-httplib
+	url = https://github.com/yhirose/cpp-httplib.git
+[submodule "ext/stduuid"]
+	path = ext/stduuid
+	url = https://github.com/mariusbancila/stduuid.git
+[submodule "ext/peelo-json"]
+	path = ext/peelo-json
+	url = https://github.com/peelonet/peelo-json.git
+[submodule "ext/peelo-unicode"]
+	path = ext/peelo-unicode
+	url = https://github.com/peelonet/peelo-unicode.git
