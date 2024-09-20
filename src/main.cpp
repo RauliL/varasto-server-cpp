@@ -100,7 +100,15 @@ parse_args(int argc, char** argv, ServerOptions& options)
         case 'p':
           if (offset < argc)
           {
-            // TODO: parse port
+            try
+            {
+              options.port = std::stoi(argv[offset++]);
+            }
+            catch (const std::exception& e)
+            {
+              std::cerr << "Invalid argument for the -p option." << std::endl;
+              std::exit(EXIT_FAILURE);
+            }
           } else {
             std::cerr << "Argument expected for the -p option." << std::endl;
             display_usage(std::cerr, argv[0]);
