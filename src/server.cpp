@@ -27,6 +27,23 @@ namespace varasto
 
   static const char* content_type = "application/json; charset=utf-8";
 
+  static std::string
+  generate_uuid()
+  {
+    std::random_device device;
+    std::array<int, std::mt19937::state_size> seed_data;
+    std::generate(
+      std::begin(seed_data),
+      std::end(seed_data),
+      std::ref(device)
+    );
+    std::seed_seq sequence(std::begin(seed_data), std::end(seed_data));
+    std::mt19937 generator(sequence);
+    uuids::uuid_random_generator gen { generator };
+
+    return uuids::to_string(gen());
+  }
+
   static void
   send_error_message(Response& res, const std::string& message, int status)
   {
@@ -37,13 +54,11 @@ namespace varasto
     res.set_content(object.dump(), content_type);
   }
 
-  static bool
-  parse_object(
-    const Request& req,
-    Response& res,
-    Storage::value_type& value
-  )
+  static std::optional<Storage::value_type>
+  parse_object(const Request& req, Response& res)
   {
+    Storage::value_type value;
+
     try
     {
       value = Storage::value_type::parse(req.body);
@@ -52,17 +67,17 @@ namespace varasto
     {
       send_error_message(res, e.what(), 400);
 
-      return false;
+      return std::nullopt;
     }
 
     if (!value.is_object())
     {
       send_error_message(res, "Value is not an object.", 400);
 
-      return false;
+      return std::nullopt;
     }
 
-    return true;
+    return value;
   }
 
   static void
@@ -146,13 +161,38 @@ namespace varasto
     const auto& key = req.path_params.at("key");
     Storage::value_type value;
 
-    if (parse_object(req, res, value))
+    if (const auto value = parse_object(req, res))
     {
-      do_set(storage, res, ns, key, value);
+      do_set(storage, res, ns, key, *value);
     }
   }
 
-  // TODO: Insertion with automatic UUID key generation.
+  static void
+  handle_entry_insert(
+    Storage& storage,
+    const Request& req,
+    Response& res
+  )
+  {
+    const auto& ns = req.path_params.at("namespace");
+
+    if (const auto value = parse_object(req, res))
+    {
+      const auto key = generate_uuid();
+      const auto result = storage.Set(ns, key, *value);
+
+      if (result)
+      {
+        auto object = Storage::value_type::object();
+
+        object["key"] = key;
+        res.status = 201;
+        res.set_content(object.dump(), content_type);
+      } else {
+        send_error_message(res, result.error(), 500);
+      }
+    }
+  }
 
   static void
   handle_entry_update(
@@ -163,11 +203,10 @@ namespace varasto
   {
     const auto& ns = req.path_params.at("namespace");
     const auto& key = req.path_params.at("key");
-    Storage::value_type value;
 
-    if (parse_object(req, res, value))
+    if (const auto value = parse_object(req, res))
     {
-      const auto result = storage.Update(ns, key, value);
+      const auto result = storage.Update(ns, key, *value);
 
       if (result)
       {
@@ -240,6 +279,13 @@ namespace varasto
       [&storage](const Request& req, Response& res)
       {
         handle_entry_list(storage, req, res);
+      }
+    );
+    server.Post(
+      "/:namespace",
+      [&storage](const Request& req, Response& res)
+      {
+        handle_entry_insert(storage, req, res);
       }
     );
     server.Get(
