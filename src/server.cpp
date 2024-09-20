@@ -317,6 +317,12 @@ namespace varasto
       }
     );
 
+    std::cout << "Listening on http://"
+              << options.hostname
+              << ":"
+              << options.port
+              << std::endl;
+
     if (!server.listen(options.hostname, options.port))
     {
       std::cerr << "Failed to listen on "
