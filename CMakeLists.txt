@@ -1,6 +1,11 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.1)
 PROJECT(varasto-server CXX)
 
+ADD_SUBDIRECTORY(./ext/cpp-httplib)
+ADD_SUBDIRECTORY(./ext/json)
+ADD_SUBDIRECTORY(./ext/peelo-result)
+ADD_SUBDIRECTORY(./ext/stduuid)
+
 FIND_PACKAGE(httplib)
 FIND_PACKAGE(nlohmann_json)
 FIND_PACKAGE(PeeloResult)
