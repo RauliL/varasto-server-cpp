@@ -33,7 +33,7 @@ namespace varasto
 
     if (entry_and_path_result)
     {
-      return get_result_type::ok(entry_and_path_result.value().second);
+      return get_result_type::ok(entry_and_path_result->second);
     }
 
     return get_result_type::error(entry_and_path_result.error());
@@ -44,9 +44,11 @@ namespace varasto
     const key_type& ns
   ) const
   {
-    if (is_valid_slug(ns))
+    const auto ns_path_result = GetNamespacePath(ns);
+
+    if (ns_path_result)
     {
-      const auto ns_path = m_root / ns;
+      const auto& ns_path = ns_path_result.value();
       std::vector<key_type> keys;
 
       if (std::filesystem::is_directory(ns_path))
@@ -63,7 +65,7 @@ namespace varasto
       return get_all_keys_type::ok(keys);
     }
 
-    return get_all_keys_type::error("Invalid namespace: " + ns);
+    return get_all_keys_type::error(ns_path_result.error());
   }
 
   Storage::set_result_type
@@ -73,11 +75,11 @@ namespace varasto
     const value_type& value
   )
   {
-    const auto path_result = GetPath(ns, key);
+    const auto path_result = GetEntryPath(ns, key);
 
     if (path_result)
     {
-      const auto ns_path = m_root / ns;
+      const auto ns_path = path_result->parent_path();
 
       if (!std::filesystem::is_directory(ns_path))
       {
@@ -142,7 +144,18 @@ namespace varasto
   }
 
   FilesystemStorage::get_path_result_type
-  FilesystemStorage::GetPath(
+  FilesystemStorage::GetNamespacePath(const key_type& ns) const
+  {
+    if (!is_valid_slug(ns))
+    {
+      return get_path_result_type::error("Invalid namespace: " + ns);
+    }
+
+    return get_path_result_type::ok(m_root / ns);
+  }
+
+  FilesystemStorage::get_path_result_type
+  FilesystemStorage::GetEntryPath(
     const key_type& ns,
     const key_type& key
   ) const
@@ -165,7 +178,7 @@ namespace varasto
     const key_type& key
   ) const
   {
-    const auto path_result = GetPath(ns, key);
+    const auto path_result = GetEntryPath(ns, key);
 
     if (path_result)
     {

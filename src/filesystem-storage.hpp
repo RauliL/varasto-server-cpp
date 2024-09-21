@@ -64,7 +64,11 @@ namespace varasto
     );
 
   private:
-    get_path_result_type GetPath(
+    get_path_result_type GetNamespacePath(
+      const key_type& ns
+    ) const;
+
+    get_path_result_type GetEntryPath(
       const key_type& ns,
       const key_type& key
     ) const;
