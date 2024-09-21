@@ -117,10 +117,21 @@ namespace varasto
     if (entry_and_path_result)
     {
       const auto& entry_and_path = entry_and_path_result.value();
+      const auto& path = entry_and_path.first;
 
-      if (std::filesystem::remove(entry_and_path.first))
+      if (std::filesystem::remove(path))
       {
-        // TODO: Delete orphan directories.
+        const auto parent = path.parent_path();
+
+        // Remove parent directory if it's empty.
+        if (
+          std::filesystem::is_directory(parent) &&
+          std::filesystem::is_empty(parent)
+        )
+        {
+          std::filesystem::remove(parent);
+        }
+
         return delete_result_type::ok(entry_and_path.second);
       }
 
