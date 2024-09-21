@@ -196,6 +196,7 @@ namespace varasto
         {
           const auto value = value_type::parse(file);
 
+          file.close();
           if (value.is_object())
           {
             return get_entry_and_path_result_type::ok(
