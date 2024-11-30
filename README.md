@@ -1,6 +1,6 @@
 # Varasto server C++ implementation
 
-C++17 implementation of [Varasto server]. Work in progress.
+C++17 implementation of [Varasto server].
 
 [Varasto server]: https://www.npmjs.com/package/@varasto/server
 
