@@ -107,7 +107,7 @@ item stored under namespace foo mapped with the key that they were stored with.
 To remove an previously stored item, you make a `DELETE` request with the
 request path again acting as the identifier of the item you wish to remove.
 
-```
+```http
 DELETE /foo/bar HTTP/1.0
 ```
 
@@ -120,7 +120,7 @@ instead.
 To remove all entries stored under an namespace, you make a `DELETE` request
 with the request path acting as identifier of the namespace you wish to remove.
 
-```
+```http
 DELETE /foo HTTP/1.0
 ```
 
