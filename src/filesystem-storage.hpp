@@ -65,7 +65,7 @@ namespace varasto
       const key_type& key
     );
 
-    delete_result_type DeleteNamespace(
+    delete_namespace_result_type DeleteNamespace(
       const key_type& ns
     );
 

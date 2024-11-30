@@ -116,6 +116,29 @@ parse_args(int argc, char** argv, ServerOptions& options)
           }
           break;
 
+        case 'a':
+          if (offset < argc)
+          {
+            const std::string input(argv[offset++]);
+            const auto colon = input.find(':');
+
+            if (colon != std::string::npos && colon > 1)
+            {
+              options.credentials = std::make_pair<std::string, std::string>(
+                input.substr(0, colon),
+                input.substr(colon + 1)
+              );
+            } else {
+              std::cerr << "Invalid argument for the -a option." << std::endl;
+              std::exit(EXIT_FAILURE);
+            }
+          } else {
+            std::cerr << "Argument expected for the -a option." << std::endl;
+            display_usage(std::cerr, argv[0]);
+            std::exit(EXIT_FAILURE);
+          }
+          break;
+
         default:
           std::cerr << "Unrecognized switch: " << arg[i] << std::endl;
           display_usage(std::cerr, argv[0]);

@@ -16,6 +16,8 @@
 #pragma once
 
 #include <filesystem>
+#include <optional>
+#include <utility>
 
 namespace varasto
 {
@@ -24,6 +26,7 @@ namespace varasto
     std::string hostname;
     int port;
     std::filesystem::path root;
+    std::optional<std::pair<std::string, std::string>> credentials;
   };
 
   void run_server(const ServerOptions& options);

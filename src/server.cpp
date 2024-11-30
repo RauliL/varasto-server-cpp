@@ -240,10 +240,21 @@ namespace varasto
 
     if (result)
     {
-      res.status = 201;
-      res.set_content("{}", content_type);
+      if (const auto entries = *result)
+      {
+        object::container_type properties;
+
+        for (const auto& entry : *entries)
+        {
+          properties[decode(entry.first)] = entry.second;
+        }
+        res.status = 201;
+        res.set_content(format(object::make(properties)), content_type);
+      } else {
+        send_error_message(res, "Namespace does not exist.", 404);
+      }
     } else {
-      send_error_message(res, result.error(), 404);
+      send_error_message(res, result.error(), 500);
     }
   }
 

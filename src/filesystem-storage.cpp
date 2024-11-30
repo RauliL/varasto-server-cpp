@@ -151,24 +151,26 @@ namespace varasto
     return delete_result_type::error(entry_and_path_result.error());
   }
 
-  Storage::delete_result_type
+  Storage::delete_namespace_result_type
   FilesystemStorage::DeleteNamespace(const key_type& ns)
   {
     const auto path_result = GetNamespacePath(ns);
 
-    if (path_result)
+    if (path_result && std::filesystem::is_directory(*path_result))
     {
-      if (std::filesystem::is_directory(*path_result))
+      const auto list_result = GetAllEntries(ns);
+
+      if (list_result)
       {
         std::filesystem::remove_all(*path_result);
 
-        return delete_result_type::ok(std::nullopt);
+        return delete_namespace_result_type::ok(*list_result);
       }
 
-      return delete_result_type::error("Namespace does not exist.");
+      return delete_namespace_result_type::error(list_result.error());
     }
 
-    return delete_result_type::error(path_result.error());
+    return delete_namespace_result_type::ok(std::nullopt);
   }
 
   FilesystemStorage::get_path_result_type

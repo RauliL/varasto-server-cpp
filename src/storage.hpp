@@ -53,6 +53,10 @@ namespace varasto
       std::optional<value_type>,
       std::string
     >;
+    using delete_namespace_result_type = peelo::result<
+      std::optional<std::vector<mapped_type>>,
+      std::string
+    >;
 
     virtual get_result_type Get(
       const key_type& ns,
@@ -84,7 +88,7 @@ namespace varasto
       const key_type& key
     ) = 0;
 
-    virtual delete_result_type DeleteNamespace(
+    virtual delete_namespace_result_type DeleteNamespace(
       const key_type& ns
     ) = 0;
   };
